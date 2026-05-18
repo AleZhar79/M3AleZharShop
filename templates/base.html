@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}M3AleZharShop{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="{% url 'products:product-list' %}" class="logo">M3AleZharShop</a>
+        <nav class="main-nav">
+            <a href="{% url 'products:product-list' %}">Каталог</a>
+            {% if user.is_authenticated %}
+                <span class="nav-user">Привет, {{ user.username }}</span>
+                {% if user.is_staff %}<a href="{% url 'admin:index' %}">Админка</a>{% endif %}
+            {% else %}
+                <a href="{% url 'admin:login' %}">Войти</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main class="container site-main">
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="msg msg--{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>© {% now "Y" %} M3AleZharShop · учебный проект</p>
+    </div>
+</footer>
+</body>
+</html>
