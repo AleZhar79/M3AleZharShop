@@ -1,0 +1,19 @@
+# --- Базовые зависимости проекта (Шаг 1) ---
+Django==5.0.6
+psycopg[binary]==3.2.1
+python-dotenv==1.0.1
+gunicorn==22.0.0
+
+# Подключим на следующих шагах (оставлено как ориентир):
+# djangorestframework==3.15.2
+# djangorestframework-simplejwt==5.3.1
+# drf-spectacular==0.27.2
+# django-filter==24.2
+# Pillow==10.3.0
+#
+# --- Dev / тесты / линтеры ---
+# pytest==8.2.2
+# pytest-django==4.8.0
+# flake8==7.1.0
+# mypy==1.10.0
+# django-stubs==5.0.2
