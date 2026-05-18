@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if current_category %}{{ current_category.name }}{% else %}Каталог{% endif %} · M3AleZharShop
+{% endblock %}
+
+{% block content %}
+<div class="catalog-layout">
+    <aside class="filters">
+        <h3>Фильтры</h3>
+        <form method="get" action="{% if current_category %}{% url 'products:category-detail' current_category.slug %}{% else %}{% url 'products:product-list' %}{% endif %}">
+            <div class="field">
+                <label for="id_q">Поиск</label>
+                {{ filter_form.q }}
+            </div>
+
+            {% if not current_category %}
+                <div class="field">
+                    <label for="id_category">Категория</label>
+                    {{ filter_form.category }}
+                </div>
+            {% endif %}
+
+            <div class="field">
+                <label for="id_price_min">Цена от</label>
+                {{ filter_form.price_min }}
+            </div>
+            <div class="field">
+                <label for="id_price_max">Цена до</label>
+                {{ filter_form.price_max }}
+            </div>
+            <div class="field">
+                <label for="id_sort">Сортировка</label>
+                {{ filter_form.sort }}
+            </div>
+
+            <div class="btn-row">
+                <button class="btn" type="submit">Применить</button>
+                <a class="btn btn--secondary"
+                   href="{% if current_category %}{% url 'products:category-detail' current_category.slug %}{% else %}{% url 'products:product-list' %}{% endif %}">
+                    Сброс
+                </a>
+            </div>
+        </form>
+    </aside>
+
+    <section>
+        <header class="catalog-header">
+            <h1>
+                {% if current_category %}
+                    Категория: {{ current_category.name }}
+                {% else %}
+                    Каталог товаров
+                {% endif %}
+            </h1>
+            <div class="catalog-summary">
+                Найдено: {{ paginator.count }}
+            </div>
+        </header>
+
+        {% if products %}
+            <div class="products-grid">
+                {% for product in products %}
+                    {% include "products/_product_card.html" with product=product %}
+                {% endfor %}
+            </div>
+
+            {% if is_paginated %}
+                <nav class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">‹ Назад</a>
+                    {% endif %}
+
+                    {% for num in paginator.page_range %}
+                        {% if num == page_obj.number %}
+                            <span class="current">{{ num }}</span>
+                        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                            <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд ›</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                По вашему запросу ничего не найдено. Попробуйте сбросить фильтры.
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
