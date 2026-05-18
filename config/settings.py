@@ -124,6 +124,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 # --- Прочее ---------------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Кастомная модель пользователя. Главное правило Django: задавать
+# AUTH_USER_MODEL ДО первой миграции и не менять позже.
+AUTH_USER_MODEL = "users.User"
+
 # Email — на этом шаге пишем письма в консоль
 EMAIL_BACKEND = os.getenv(
     "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
