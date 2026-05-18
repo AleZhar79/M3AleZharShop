@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} · M3AleZharShop{% endblock %}
+
+{% block content %}
+{#
+   Заглушка детальной страницы товара.
+   Полная реализация (галерея, отзывы, кнопка «В корзину») — на Шаге 4.
+#}
+<p><a href="{% url 'products:product-list' %}">← Назад в каталог</a></p>
+
+<article style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px; background:#fff; padding:24px; border-radius:8px; border:1px solid #e5e7eb;">
+    <div class="product-card__image" style="aspect-ratio:1/1; border-radius:6px;
+        {% if product.image %}background-image:url('{{ product.image.url }}');{% endif %}">
+        {% if not product.image %}нет фото{% endif %}
+    </div>
+    <div>
+        <h1 style="margin-top:0;">{{ product.name }}</h1>
+        <div style="color:#6b7280; margin-bottom:8px;">
+            Категория:
+            <a href="{% url 'products:category-detail' product.category.slug %}">{{ product.category.name }}</a>
+        </div>
+        <div style="font-size:24px; font-weight:600; margin:12px 0;">{{ product.price }} ₽</div>
+        {% if product.in_stock %}
+            <div class="product-card__stock product-card__stock--in" style="margin-bottom:12px;">
+                В наличии: {{ product.stock }}
+            </div>
+        {% else %}
+            <div class="product-card__stock product-card__stock--out" style="margin-bottom:12px;">
+                Нет в наличии
+            </div>
+        {% endif %}
+        <p style="white-space:pre-line; color:#374151;">{{ product.description|default:"Описание появится позже." }}</p>
+
+        <div style="margin-top:16px; padding:12px; background:#fffbeb; border:1px dashed #fbbf24; border-radius:6px; color:#92400e; font-size:13px;">
+            Кнопка «Добавить в корзину» появится на Шаге 4.
+        </div>
+    </div>
+</article>
+{% endblock %}

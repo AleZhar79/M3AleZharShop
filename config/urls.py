@@ -2,18 +2,15 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.http import HttpRequest, HttpResponse
-from django.urls import path
-
-
-def healthcheck(_request: HttpRequest) -> HttpResponse:
-    """Простой эндпоинт для проверки, что приложение поднялось."""
-    return HttpResponse("OK", content_type="text/plain")
-
+from django.urls import include, path
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", healthcheck, name="healthcheck"),
+    # Каталог — основной namespace 'products' на '/products/'.
+    path("products/", include("apps.products.urls")),
+    # Главная страница '/' ведёт в каталог.
+    path("", RedirectView.as_view(pattern_name="products:product-list", permanent=False)),
 ]
 
 if settings.DEBUG:

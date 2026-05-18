@@ -1,0 +1,19 @@
+{# Карточка одного товара. Принимает в контекст переменную 'product'. #}
+<article class="product-card">
+    <a href="{{ product.get_absolute_url }}" class="product-card__image"
+       {% if product.image %}style="background-image:url('{{ product.image.url }}')"{% endif %}>
+        {% if not product.image %}нет фото{% endif %}
+    </a>
+    <div class="product-card__body">
+        <h2 class="product-card__title">
+            <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+        </h2>
+        <div class="product-card__category">{{ product.category.name }}</div>
+        <div class="product-card__price">{{ product.price }} ₽</div>
+        {% if product.in_stock %}
+            <div class="product-card__stock product-card__stock--in">В наличии: {{ product.stock }}</div>
+        {% else %}
+            <div class="product-card__stock product-card__stock--out">Нет в наличии</div>
+        {% endif %}
+    </div>
+</article>
