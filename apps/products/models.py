@@ -1,4 +1,5 @@
 """Модели приложения products: каталог категорий и товаров."""
+
 from __future__ import annotations
 
 from decimal import Decimal

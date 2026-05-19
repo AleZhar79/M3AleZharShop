@@ -3,6 +3,7 @@
 Все эндпоинты живут под префиксом ``/api/``. JWT-аутентификация
 реализована поверх SimpleJWT, документация — drf-spectacular.
 """
+
 from __future__ import annotations
 
 from django.urls import include, path
@@ -42,12 +43,10 @@ urlpatterns = [
     path("auth/token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path("auth/token/verify/", TokenVerifyView.as_view(), name="token-verify"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
-
     # OpenAPI / Swagger / Redoc
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path("docs/", SpectacularSwaggerView.as_view(url_name="api:schema"), name="docs"),
     path("redoc/", SpectacularRedocView.as_view(url_name="api:schema"), name="redoc"),
-
     # CRUD ресурсы
     path("", include(router.urls)),
 ]

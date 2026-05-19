@@ -4,6 +4,7 @@
 ``staff``. Считает основные KPI магазина: выручка, заказы по статусам,
 топ товаров, продажи по дням за выбранный период.
 """
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -53,16 +54,10 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             Value(Decimal("0.00"), output_field=DecimalField(max_digits=12, decimal_places=2)),
         )
     )["total"]
-    avg_order = (
-        (revenue / paid_qs.count()) if paid_qs.exists() else Decimal("0.00")
-    )
+    avg_order = (revenue / paid_qs.count()) if paid_qs.exists() else Decimal("0.00")
 
     # Заказы по статусам -------------------------------------------------
-    by_status = (
-        orders_qs.values("status")
-        .annotate(n=Count("id"))
-        .order_by("-n")
-    )
+    by_status = orders_qs.values("status").annotate(n=Count("id")).order_by("-n")
     status_display = dict(OrderStatus.choices)
     by_status_rows = [
         {"status": status_display.get(row["status"], row["status"]), "n": row["n"]}
@@ -94,8 +89,7 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 
     # Продажи по дням ---------------------------------------------------
     daily = (
-        paid_qs
-        .annotate(day=TruncDate("created_at"))
+        paid_qs.annotate(day=TruncDate("created_at"))
         .values("day")
         .annotate(
             orders=Count("id"),
@@ -111,10 +105,9 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     )
 
     # Низкие остатки и общая статистика каталога ------------------------
-    low_stock = (
-        Product.objects.filter(is_active=True, stock__lte=5, stock__gt=0)
-        .order_by("stock")[:10]
-    )
+    low_stock = Product.objects.filter(is_active=True, stock__lte=5, stock__gt=0).order_by("stock")[
+        :10
+    ]
     out_of_stock_count = Product.objects.filter(is_active=True, stock=0).count()
     catalog_total = Product.objects.filter(is_active=True).count()
     reviews_total = Review.objects.count()

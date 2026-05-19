@@ -4,8 +4,9 @@ Django settings for M3AleZharShop project.
 Базовая конфигурация. Чувствительные параметры берутся из переменных окружения
 (см. .env.example).
 """
-from pathlib import Path
+
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -25,7 +26,9 @@ def _env_bool(name: str, default: bool = False) -> bool:
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-change-me")
 DEBUG = _env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = [
-    h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()
+    h.strip()
+    for h in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    if h.strip()
 ]
 
 # --- Приложения -----------------------------------------------------------
@@ -137,9 +140,7 @@ LOGIN_REDIRECT_URL = "account:profile"
 LOGOUT_REDIRECT_URL = "products:product-list"
 
 # Email — на этом шаге пишем письма в консоль
-EMAIL_BACKEND = os.getenv(
-    "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
-)
+EMAIL_BACKEND = os.getenv("DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "noreply@m3alezhar.local")
 
 # На какие адреса слать копии уведомлений о новых заказах (через запятую).
@@ -155,9 +156,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",

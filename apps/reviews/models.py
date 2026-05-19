@@ -1,4 +1,5 @@
 """Модели приложения reviews: отзывы на товары."""
+
 from __future__ import annotations
 
 from django.conf import settings
