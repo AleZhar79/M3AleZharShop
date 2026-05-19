@@ -182,6 +182,50 @@ docker compose down -v
 
 ---
 
+## Тесты и качество кода (Шаг 9)
+
+В проекте настроены `ruff` (линтер), `black` (форматтер) и `pytest` + `pytest-django` (тесты).
+Конфигурация — в `pyproject.toml`. Тестовые настройки — в `config/test_settings.py`
+(SQLite in-memory, locmem email, ускоренный hasher).
+
+```bash
+# Запустить весь набор тестов (27 тестов)
+docker compose exec web pytest
+
+# Подробный вывод
+docker compose exec web pytest -v
+
+# Один файл
+docker compose exec web pytest tests/test_products.py
+
+# Проверка линтером (без исправлений)
+docker compose exec web ruff check .
+
+# Авто-исправление
+docker compose exec web ruff check . --fix
+
+# Проверка форматирования
+docker compose exec web black --check .
+
+# Применить форматирование
+docker compose exec web black .
+```
+
+Покрытие тестами:
+
+| Файл | Тестов | Что проверяет |
+|---|---|---|
+| `tests/test_products.py` | 5 | каталог, деталь, неактивный товар (404), поиск, фильтр по цене |
+| `tests/test_cart.py` | 5 | пустая корзина, добавление, изменение количества, удаление, очистка |
+| `tests/test_orders.py` | 4 | оформление заказа, пустая корзина, нехватка остатка, email |
+| `tests/test_reviews.py` | 4 | требует авторизации, добавление, запрет дубликата, валидация |
+| `tests/test_account.py` | 4 | регистрация, вход/выход, профиль, изоляция чужих заказов |
+| `tests/test_api.py` | 5 | JWT auth, products list/filter, создание заказа, Swagger schema |
+
+Всего **27 тестов**, прогон ≈ 1.2 секунды.
+
+---
+
 ## Запуск без Docker (опционально, для разработки)
 
 ```bash
@@ -211,8 +255,8 @@ python manage.py runserver
 - [x] Шаг 6: личный кабинет, история заказов, аутентификация
 - [x] Шаг 7: расширенная админка и дашборд аналитики
 - [x] Шаг 8: REST API + JWT + Swagger
-- [ ] Шаг 9: линтеры, типизация, тесты
-- [ ] (Бонус) GraphQL, CI/CD
+- [x] Шаг 9: линтеры (ruff, black), тесты (pytest)
+- [ ] (Бонус) GraphQL, CI/CD, mypy + django-stubs
 
 ---
 
