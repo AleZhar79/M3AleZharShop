@@ -1,4 +1,5 @@
 """Тесты REST API (auth, products, orders)."""
+
 from __future__ import annotations
 
 import json

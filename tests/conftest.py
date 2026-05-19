@@ -1,4 +1,5 @@
 """Общие фикстуры pytest для всех тестов проекта."""
+
 from __future__ import annotations
 
 from decimal import Decimal

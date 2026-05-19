@@ -1,4 +1,5 @@
 """Тесты отзывов: добавление через форму на странице товара."""
+
 from __future__ import annotations
 
 import pytest

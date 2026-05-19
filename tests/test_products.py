@@ -1,4 +1,5 @@
 """Тесты каталога: список товаров, фильтры, поиск, пагинация, деталь."""
+
 from __future__ import annotations
 
 from decimal import Decimal

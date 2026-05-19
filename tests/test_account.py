@@ -1,4 +1,5 @@
 """Тесты личного кабинета."""
+
 from __future__ import annotations
 
 import pytest
@@ -54,8 +55,9 @@ def test_profile_requires_auth(client):
 def test_orders_page_only_shows_own_orders(
     auth_client, client, user, other_user, password, product
 ):
-    from apps.orders.models import Order, OrderItem
     from decimal import Decimal
+
+    from apps.orders.models import Order, OrderItem
 
     my_order = Order.objects.create(user=user, total_price=Decimal("100.00"))
     OrderItem.objects.create(order=my_order, product=product, quantity=1, price=Decimal("100.00"))
