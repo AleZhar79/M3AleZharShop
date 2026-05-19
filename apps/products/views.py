@@ -3,12 +3,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from django.db.models import Q, QuerySet
+from django.db.models import Avg, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView
 
+from apps.cart.forms import CartAddProductForm
 from apps.products.forms import ProductFilterForm
 from apps.products.models import Category, Product
+from apps.reviews.forms import ReviewForm
 
 DEFAULT_SORT = "-created_at"
 
@@ -79,7 +81,7 @@ class CategoryDetailView(ProductListView):
 
 
 class ProductDetailView(DetailView):
-    """Детальная страница товара. На Шаге 3 — заглушка, развернётся на Шаге 4."""
+    """Детальная страница товара: описание, отзывы, кнопка «в корзину»."""
 
     model = Product
     template_name = "products/product_detail.html"
@@ -89,3 +91,22 @@ class ProductDetailView(DetailView):
 
     def get_queryset(self) -> QuerySet[Product]:
         return Product.objects.filter(is_active=True).select_related("category")
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        product: Product = ctx["product"]
+        reviews = product.reviews.select_related("user").order_by("-created_at")
+        agg = reviews.aggregate(avg=Avg("rating"))
+        ctx["reviews"] = reviews
+        ctx["avg_rating"] = agg["avg"]
+        ctx["reviews_count"] = reviews.count()
+        ctx["cart_form"] = CartAddProductForm()
+
+        user = self.request.user
+        if user.is_authenticated:
+            ctx["user_already_reviewed"] = reviews.filter(user=user).exists()
+            ctx["review_form"] = ReviewForm()
+        else:
+            ctx["user_already_reviewed"] = False
+            ctx["review_form"] = None
+        return ctx
