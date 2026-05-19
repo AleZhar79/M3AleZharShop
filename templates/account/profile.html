@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет · M3AleZharShop{% endblock %}
+
+{% block content %}
+<h1>Личный кабинет</h1>
+
+<div class="account-grid">
+    <section class="card">
+        <h2>Профиль</h2>
+        <dl class="meta">
+            <dt>Логин</dt><dd>{{ user.username }}</dd>
+            <dt>Имя</dt><dd>{{ user.first_name|default:"—" }}</dd>
+            <dt>Фамилия</dt><dd>{{ user.last_name|default:"—" }}</dd>
+            <dt>Email</dt><dd>{{ user.email|default:"—" }}</dd>
+            <dt>Зарегистрирован</dt><dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
+        </dl>
+        <a href="{% url 'account:profile-edit' %}" class="btn">Редактировать</a>
+    </section>
+
+    <section class="card">
+        <h2>Последние заказы</h2>
+        {% if recent_orders %}
+            <ul class="order-list">
+                {% for order in recent_orders %}
+                    <li>
+                        <a href="{% url 'account:order-detail' order.pk %}">
+                            #{{ order.pk }} от {{ order.created_at|date:"d.m.Y H:i" }}
+                        </a>
+                        <span class="muted">— {{ order.get_status_display }}, {{ order.total_price }} ₽</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'account:order-list' %}" class="btn">Вся история →</a>
+        {% else %}
+            <p class="muted">У вас пока нет заказов.</p>
+            <a href="{% url 'products:product-list' %}" class="btn">Перейти в каталог</a>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -69,7 +69,7 @@
         {% endif %}
     {% else %}
         <p class="muted">
-            Чтобы оставить отзыв, <a href="{% url 'admin:login' %}?next={{ request.path }}">войдите</a>.
+            Чтобы оставить отзыв, <a href="{% url 'account:login' %}?next={{ request.path }}">войдите</a>.
         </p>
     {% endif %}
 
