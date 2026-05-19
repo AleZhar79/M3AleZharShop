@@ -13,6 +13,8 @@ urlpatterns = [
     path("cart/", include("apps.cart.urls")),
     # Отзывы.
     path("reviews/", include("apps.reviews.urls")),
+    # Заказы.
+    path("orders/", include("apps.orders.urls")),
     # Главная страница '/' ведёт в каталог.
     path("", RedirectView.as_view(pattern_name="products:product-list", permanent=False)),
 ]

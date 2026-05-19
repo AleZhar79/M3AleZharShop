@@ -139,3 +139,10 @@ EMAIL_BACKEND = os.getenv(
     "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
 DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "noreply@m3alezhar.local")
+
+# На какие адреса слать копии уведомлений о новых заказах (через запятую).
+ORDER_NOTIFICATIONS_TO = [
+    addr.strip()
+    for addr in os.getenv("DJANGO_ORDER_NOTIFICATIONS_TO", "shop-admin@m3alezhar.local").split(",")
+    if addr.strip()
+]
