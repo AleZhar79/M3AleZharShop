@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | M3AleZharShop admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">M3AleZharShop · админка</a>
+    &middot;
+    <a href="{% url 'admin-dashboard' %}" style="font-size: 14px;">📊 Дашборд</a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

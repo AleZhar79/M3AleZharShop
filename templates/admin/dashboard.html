@@ -1,0 +1,141 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">M3AleZharShop · Аналитика</a></h1>
+{% endblock %}
+
+{% block content %}
+<style>
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+.kpi { background: #fff; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; }
+.kpi__label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.kpi__value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+.dashboard-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 1000px) { .dashboard-grid { grid-template-columns: 1fr; } }
+.dashboard-card { background: #fff; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; }
+.dashboard-card h2 { margin-top: 0; font-size: 15px; }
+.dashboard-card table { width: 100%; border-collapse: collapse; }
+.dashboard-card th, .dashboard-card td { padding: 6px 8px; border-bottom: 1px solid #f3f4f6; text-align: left; font-size: 13px; }
+.period-filter { display: flex; gap: 8px; align-items: center; margin: 12px 0; }
+.period-filter a { padding: 4px 10px; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none; color: #111827; font-size: 13px; }
+.period-filter a.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+.bar { background: #e5e7eb; height: 8px; border-radius: 999px; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: #2563eb; }
+</style>
+
+<form method="get" class="period-filter">
+    <span><strong>Период:</strong></span>
+    {% for d in period_choices %}
+        <a href="?days={{ d }}" {% if d == days %}class="active"{% endif %}>{{ d }} дн.</a>
+    {% endfor %}
+    <span style="color:#6b7280; margin-left:12px;">С {{ since|date:"d.m.Y H:i" }}</span>
+</form>
+
+<div class="kpi-grid">
+    <div class="kpi">
+        <div class="kpi__label">Выручка</div>
+        <div class="kpi__value">{{ revenue|floatformat:2 }} ₽</div>
+    </div>
+    <div class="kpi">
+        <div class="kpi__label">Всего заказов</div>
+        <div class="kpi__value">{{ total_orders }}</div>
+    </div>
+    <div class="kpi">
+        <div class="kpi__label">Оплаченных</div>
+        <div class="kpi__value">{{ paid_orders }}</div>
+    </div>
+    <div class="kpi">
+        <div class="kpi__label">Средний чек</div>
+        <div class="kpi__value">{{ avg_order|floatformat:2 }} ₽</div>
+    </div>
+    <div class="kpi">
+        <div class="kpi__label">Товаров в каталоге</div>
+        <div class="kpi__value">{{ catalog_total }}</div>
+    </div>
+    <div class="kpi">
+        <div class="kpi__label">Нет в наличии</div>
+        <div class="kpi__value">{{ out_of_stock_count }}</div>
+    </div>
+    <div class="kpi">
+        <div class="kpi__label">Отзывов всего</div>
+        <div class="kpi__value">{{ reviews_total }}</div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <section class="dashboard-card">
+        <h2>Топ-10 товаров по выручке</h2>
+        {% if top_products %}
+        <table>
+            <thead><tr><th>Товар</th><th>Шт.</th><th style="text-align:right;">Выручка</th></tr></thead>
+            <tbody>
+                {% for row in top_products %}
+                <tr>
+                    <td>
+                        <a href="{% url 'admin:products_product_change' row.product__id %}">{{ row.product__name }}</a>
+                    </td>
+                    <td>{{ row.total_qty }}</td>
+                    <td style="text-align:right;">{{ row.revenue|floatformat:2 }} ₽</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}<p>Пока нет оплаченных заказов в выбранном периоде.</p>{% endif %}
+    </section>
+
+    <section class="dashboard-card">
+        <h2>Заказы по статусам</h2>
+        {% if by_status_rows %}
+        <table>
+            <thead><tr><th>Статус</th><th style="text-align:right;">Заказов</th></tr></thead>
+            <tbody>
+                {% for row in by_status_rows %}
+                <tr>
+                    <td>{{ row.status }}</td>
+                    <td style="text-align:right;">{{ row.n }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}<p>В выбранном периоде заказов нет.</p>{% endif %}
+    </section>
+
+    <section class="dashboard-card">
+        <h2>Продажи по дням</h2>
+        {% if daily %}
+        <table>
+            <thead><tr><th>День</th><th>Заказов</th><th style="text-align:right;">Выручка</th></tr></thead>
+            <tbody>
+                {% for row in daily %}
+                <tr>
+                    <td>{{ row.day|date:"d.m.Y" }}</td>
+                    <td>{{ row.orders }}</td>
+                    <td style="text-align:right;">{{ row.revenue|floatformat:2 }} ₽</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}<p>В выбранном периоде продаж нет.</p>{% endif %}
+    </section>
+
+    <section class="dashboard-card">
+        <h2>Низкие остатки (≤ 5)</h2>
+        {% if low_stock %}
+        <table>
+            <thead><tr><th>Товар</th><th style="text-align:right;">Остаток</th></tr></thead>
+            <tbody>
+                {% for p in low_stock %}
+                <tr>
+                    <td><a href="{% url 'admin:products_product_change' p.id %}">{{ p.name }}</a></td>
+                    <td style="text-align:right;">{{ p.stock }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}<p>Все товары в нормальном остатке.</p>{% endif %}
+    </section>
+</div>
+
+<p style="margin-top:16px;"><a href="{% url 'admin:index' %}">← К админ-индексу</a></p>
+{% endblock %}
