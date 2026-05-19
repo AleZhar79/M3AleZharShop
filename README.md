@@ -161,4 +161,4 @@ python manage.py runserver
 
 ## Лицензия и автор
 
-Учебный проект. Автор: Aleksei Zharov (AleZhar).
+Учебный проект. Автор: Aleksei Zharkov (AleZhar).
