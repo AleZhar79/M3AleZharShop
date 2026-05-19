@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Оформление заказа · M3AleZharShop{% endblock %}
+
+{% block content %}
+<h1>Оформление заказа</h1>
+
+<div class="checkout">
+    <form action="" method="post" class="checkout-form" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-row">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="field-errors">{{ field.errors|join:" " }}</div>
+                {% endif %}
+                {% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn--primary">Подтвердить заказ</button>
+    </form>
+
+    <aside class="checkout-summary">
+        <h2>Ваш заказ</h2>
+        <ul class="checkout-items">
+            {% for item in cart %}
+                <li>
+                    <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                    <strong>{{ item.total_price }} ₽</strong>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="checkout-total">
+            <span>Итого:</span>
+            <strong>{{ cart.total_price }} ₽</strong>
+        </div>
+        <a href="{% url 'cart:detail' %}" class="muted">← Изменить корзину</a>
+    </aside>
+</div>
+{% endblock %}
