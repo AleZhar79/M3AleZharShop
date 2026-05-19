@@ -1,5 +1,7 @@
 # M3AleZharShop
 
+[![CI](https://github.com/AleZhar79/M3AleZharShop/actions/workflows/ci.yml/badge.svg)](https://github.com/AleZhar79/M3AleZharShop/actions/workflows/ci.yml)
+
 Интернет-магазин на Django/DRF. Учебный проект (ТЗ — `06-Project-M3-1.md`).
 
 > **Статус:** Шаг 1 — каркас проекта. Подняты Django + PostgreSQL в Docker
@@ -182,6 +184,22 @@ docker compose down -v
 
 ---
 
+## CI на GitHub Actions
+
+При каждом пуше в `main` и при каждом открытом PR автоматически запускается
+workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+1. **Lint** — `ruff check .` + `black --check .`
+2. **Tests** — `pytest -v` (запускается только если линтеры прошли)
+
+Тесты используют `config.test_settings` со SQLite in-memory, поэтому
+PostgreSQL в CI **не требуется** — это делает прогон очень быстрым.
+
+Статус последнего прогона — в бейдже в самом верху этого README.
+История всех прогонов: [Actions → CI](https://github.com/AleZhar79/M3AleZharShop/actions/workflows/ci.yml).
+
+---
+
 ## Тесты и качество кода (Шаг 9)
 
 В проекте настроены `ruff` (линтер), `black` (форматтер) и `pytest` + `pytest-django` (тесты).
@@ -256,7 +274,8 @@ python manage.py runserver
 - [x] Шаг 7: расширенная админка и дашборд аналитики
 - [x] Шаг 8: REST API + JWT + Swagger
 - [x] Шаг 9: линтеры (ruff, black), тесты (pytest)
-- [ ] (Бонус) GraphQL, CI/CD, mypy + django-stubs
+- [x] (Бонус) CI на GitHub Actions (ruff + black + pytest)
+- [ ] (Бонус) GraphQL, mypy + django-stubs
 
 ---
 
