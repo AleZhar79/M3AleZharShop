@@ -55,7 +55,7 @@
             <button type="submit" class="btn btn--danger">Очистить корзину</button>
         </form>
         <a href="{% url 'products:product-list' %}" class="btn">Продолжить покупки</a>
-        <span class="muted">Оформление заказа появится на Шаге 5.</span>
+        <a href="{% url 'orders:order-create' %}" class="btn btn--primary">Оформить заказ</a>
     </div>
 {% endif %}
 {% endblock %}

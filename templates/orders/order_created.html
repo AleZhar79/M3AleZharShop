@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Заказ #{{ order.pk }} принят · M3AleZharShop{% endblock %}
+
+{% block content %}
+<div class="order-thanks">
+    <h1>Спасибо за заказ</h1>
+    <p>Ваш заказ <strong>#{{ order.pk }}</strong> принят. Подтверждение отправлено на {{ order.contact_email }}.</p>
+
+    <h2>Детали</h2>
+    <table class="cart-table">
+        <thead><tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Сумма</th></tr></thead>
+        <tbody>
+            {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.price }} ₽</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.line_total }} ₽</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Итого</strong></td>
+                <td><strong>{{ order.total_price }} ₽</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="order-thanks__meta">
+        <div><strong>Получатель:</strong> {{ order.customer_name }}</div>
+        <div><strong>Телефон:</strong> {{ order.contact_phone }}</div>
+        <div><strong>Адрес:</strong> {{ order.shipping_address }}</div>
+        {% if order.comment %}<div><strong>Комментарий:</strong> {{ order.comment }}</div>{% endif %}
+        <div><strong>Статус:</strong> {{ order.get_status_display }}</div>
+    </div>
+
+    <a href="{% url 'products:product-list' %}" class="btn">Вернуться в каталог</a>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+Новый заказ #{{ order.pk }}
+
+Получатель: {{ order.customer_name }}
+Email: {{ order.contact_email }}
+Телефон: {{ order.contact_phone }}
+Адрес: {{ order.shipping_address }}
+{% if order.comment %}Комментарий: {{ order.comment }}{% endif %}
+
+Состав:
+{% for item in items %}- {{ item.product.name }} × {{ item.quantity }} = {{ item.line_total }} ₽
+{% endfor %}
+Итого: {{ order.total_price }} ₽
+
+Открыть в админке: {{ admin_url }}

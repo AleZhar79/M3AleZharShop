@@ -49,9 +49,11 @@ class Order(TimeStampedModel):
         decimal_places=2,
         default=Decimal("0.00"),
     )
+    customer_name = models.CharField("Имя получателя", max_length=150, blank=True)
     shipping_address = models.TextField("Адрес доставки", blank=True)
     contact_phone = models.CharField("Телефон для связи", max_length=32, blank=True)
     contact_email = models.EmailField("Email для связи", blank=True)
+    comment = models.TextField("Комментарий к заказу", blank=True)
 
     class Meta:
         verbose_name = "Заказ"
