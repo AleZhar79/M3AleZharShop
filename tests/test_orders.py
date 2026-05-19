@@ -1,4 +1,5 @@
 """Тесты сервисного слоя orders.place_order."""
+
 from __future__ import annotations
 
 from decimal import Decimal
@@ -61,18 +62,14 @@ def test_place_order_creates_order_and_decrements_stock(
 
 
 @pytest.mark.django_db
-def test_place_order_empty_cart_raises(
-    request_with_session, user, order_form_data
-):
+def test_place_order_empty_cart_raises(request_with_session, user, order_form_data):
     cart = Cart(request_with_session)
     with pytest.raises(EmptyCartError):
         place_order(user=user, cart=cart, form_data=order_form_data)
 
 
 @pytest.mark.django_db
-def test_place_order_out_of_stock_rolls_back(
-    request_with_session, user, product, order_form_data
-):
+def test_place_order_out_of_stock_rolls_back(request_with_session, user, product, order_form_data):
     cart = Cart(request_with_session)
     cart.add(product, quantity=product.stock)  # ровно stock
     # Искусственно портим состояние: снижаем stock ниже того, что
@@ -91,9 +88,7 @@ def test_place_order_out_of_stock_rolls_back(
 
 
 @pytest.mark.django_db
-def test_send_order_confirmation_sends_email(
-    request_with_session, user, product, order_form_data
-):
+def test_send_order_confirmation_sends_email(request_with_session, user, product, order_form_data):
     cart = Cart(request_with_session)
     cart.add(product, quantity=1)
     order = place_order(user=user, cart=cart, form_data=order_form_data)
