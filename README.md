@@ -85,6 +85,9 @@ docker compose exec web python manage.py createsuperuser
 - Healthcheck: <http://127.0.0.1:8000/> → должен вернуть `OK`
 - Админка: <http://127.0.0.1:8000/admin/>
 - Дашборд аналитики (только для staff): <http://127.0.0.1:8000/admin/dashboard/>
+- REST API + Swagger UI: <http://127.0.0.1:8000/api/docs/>
+- ReDoc: <http://127.0.0.1:8000/api/redoc/>
+- OpenAPI схема: <http://127.0.0.1:8000/api/schema/>
 
 На дашборде:
 - KPI: выручка, всего заказов, оплаченных, средний чек, товаров в каталоге,
@@ -98,6 +101,45 @@ docker compose exec web python manage.py createsuperuser
 В админке заказов появились массовые действия: «Отметить как оплаченные»,
 «Отметить как отправленные», «Отметить как доставленные», «Отменить заказы».
 В админке товаров — «Скрыть из каталога» и «Вернуть в каталог».
+
+### REST API (Шаг 8)
+
+Все эндпоинты живут под `адрес/api/`. Аутентификация — JWT (SimpleJWT),
+документация — OpenAPI 3 через drf-spectacular.
+
+**Аутентификация:**
+- `POST /api/auth/register/` — регистрация.
+- `POST /api/auth/token/` — получить access+refresh.
+- `POST /api/auth/token/refresh/` — обновить access.
+- `POST /api/auth/token/verify/` — проверить токен.
+- `GET  /api/auth/me/` — текущий пользователь.
+
+**Ресурсы:**
+- `GET /api/products/` — список товаров, фильтры `?category=`, `?min_price=`, `?max_price=`,
+  `?in_stock=`, `?search=`, `?ordering=price|-price|name|...`, пагинация.
+- `GET /api/products/{slug}/` — детальная карточка.
+- `GET|POST /api/products/{slug}/reviews/` — отзывы к товару (POST — только авторизованные).
+- `GET /api/categories/` и `GET /api/categories/{slug}/`.
+- `GET|POST|PATCH|DELETE /api/reviews/` — CRUD отзывов (изменять/удалять может только автор).
+- `GET|POST /api/orders/` — список и создание заказов (только свои).
+
+**Пример создания заказа:**
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/orders/ \
+  -H "Authorization: Bearer <ACCESS>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_name": "Иван Петров",
+    "shipping_address": "СПб, Невский 1",
+    "contact_phone": "+79990000000",
+    "contact_email": "ivan@example.com",
+    "items": [{"product": 1, "quantity": 2}, {"product": 5, "quantity": 1}]
+  }'
+```
+
+Цена позиции берётся из `Product.price` на момент оформления (цена-снимок),
+остатки списываются в транзакции с `SELECT FOR UPDATE`.
 
 ### Если порт PostgreSQL уже занят
 
@@ -168,7 +210,7 @@ python manage.py runserver
 - [x] Шаг 5: оформление заказа и email-уведомления
 - [x] Шаг 6: личный кабинет, история заказов, аутентификация
 - [x] Шаг 7: расширенная админка и дашборд аналитики
-- [ ] Шаг 8: REST API + JWT + Swagger
+- [x] Шаг 8: REST API + JWT + Swagger
 - [ ] Шаг 9: линтеры, типизация, тесты
 - [ ] (Бонус) GraphQL, CI/CD
 

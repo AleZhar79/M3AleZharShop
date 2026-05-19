@@ -21,6 +21,8 @@ urlpatterns = [
     path("orders/", include("apps.orders.urls")),
     # Личный кабинет.
     path("account/", include("apps.account.urls")),
+    # REST API + JWT + Swagger.
+    path("api/", include("apps.api.urls", namespace="api")),
     # Главная страница '/' ведёт в каталог.
     path("", RedirectView.as_view(pattern_name="products:product-list", permanent=False)),
 ]
