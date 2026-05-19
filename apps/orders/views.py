@@ -1,4 +1,5 @@
 """Представления приложения orders."""
+
 from __future__ import annotations
 
 from django.contrib import messages

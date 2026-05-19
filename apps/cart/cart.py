@@ -5,12 +5,11 @@
 фиксируется в момент добавления, чтобы изменение каталога не влияло на
 уже добавленные в корзину товары.
 """
+
 from __future__ import annotations
 
+from collections.abc import Iterator
 from decimal import Decimal
-from typing import Iterator
-
-from django.conf import settings
 
 from apps.products.models import Product
 

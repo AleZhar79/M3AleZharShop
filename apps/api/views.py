@@ -4,10 +4,10 @@
 ``ModelViewSet``, что даёт нам list/retrieve/create/update/destroy
 из коробки.
 """
+
 from __future__ import annotations
 
-from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -97,13 +97,21 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             OpenApiParameter("ordering", type=str, required=False),
         ],
     )
-    @action(detail=True, methods=("get", "post"), url_path="reviews",
-            permission_classes=(permissions.IsAuthenticatedOrReadOnly,))
+    @action(
+        detail=True,
+        methods=("get", "post"),
+        url_path="reviews",
+        permission_classes=(permissions.IsAuthenticatedOrReadOnly,),
+    )
     def reviews(self, request, slug: str | None = None):
         """Отзывы к товару: GET — список, POST — добавить (авторизованный)."""
         product = self.get_object()
         if request.method == "GET":
-            qs = Review.objects.filter(product=product).select_related("user").order_by("-created_at")
+            qs = (
+                Review.objects.filter(product=product)
+                .select_related("user")
+                .order_by("-created_at")
+            )
             page = self.paginate_queryset(qs)
             serializer = ReviewSerializer(page or qs, many=True, context={"request": request})
             if page is not None:

@@ -1,13 +1,12 @@
 """Представления личного кабинета."""
-from __future__ import annotations
 
-from typing import Any
+from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView, UpdateView
@@ -33,10 +32,7 @@ def signup(request: HttpRequest) -> HttpResponse:
 @login_required
 def profile(request: HttpRequest) -> HttpResponse:
     """Краткая сводка профиля + последние 5 заказов."""
-    recent_orders = (
-        Order.objects.filter(user=request.user)
-        .order_by("-created_at")[:5]
-    )
+    recent_orders = Order.objects.filter(user=request.user).order_by("-created_at")[:5]
     return render(
         request,
         "account/profile.html",
@@ -68,8 +64,7 @@ class OrderListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return (
-            Order.objects
-            .filter(user=self.request.user)
+            Order.objects.filter(user=self.request.user)
             .prefetch_related("items__product")
             .order_by("-created_at")
         )

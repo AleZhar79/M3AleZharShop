@@ -4,6 +4,7 @@
 никаких ``fields = '__all__'``. Это защищает от случайного раскрытия
 служебных полей и упрощает версионирование API.
 """
+
 from __future__ import annotations
 
 from decimal import Decimal
@@ -72,8 +73,14 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
-            "id", "name", "slug", "price", "stock",
-            "is_active", "category", "image",
+            "id",
+            "name",
+            "slug",
+            "price",
+            "stock",
+            "is_active",
+            "category",
+            "image",
         )
         read_only_fields = fields
 
@@ -83,7 +90,9 @@ class ProductDetailSerializer(ProductListSerializer):
 
     class Meta(ProductListSerializer.Meta):
         fields = ProductListSerializer.Meta.fields + (
-            "description", "created_at", "updated_at",
+            "description",
+            "created_at",
+            "updated_at",
         )
         read_only_fields = fields
 
@@ -103,8 +112,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = (
-            "id", "product", "user", "user_username",
-            "rating", "comment", "created_at",
+            "id",
+            "product",
+            "user",
+            "user_username",
+            "rating",
+            "comment",
+            "created_at",
         )
         read_only_fields = ("id", "user", "user_username", "created_at")
         extra_kwargs = {
@@ -127,9 +141,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> Review:
         request = self.context["request"]
         product = self.context.get("product") or validated_data.pop("product")
-        return Review.objects.create(
-            user=request.user, product=product, **validated_data
-        )
+        return Review.objects.create(user=request.user, product=product, **validated_data)
 
 
 # --- Заказы ---------------------------------------------------------------
@@ -155,9 +167,7 @@ class OrderItemWriteSerializer(serializers.Serializer):
     на момент оформления (цена-снимок).
     """
 
-    product = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.filter(is_active=True)
-    )
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.filter(is_active=True))
     quantity = serializers.IntegerField(min_value=1)
 
 
@@ -171,9 +181,19 @@ class OrderReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = (
-            "id", "user", "status", "status_display", "total_price",
-            "customer_name", "shipping_address", "contact_phone", "contact_email",
-            "comment", "items", "created_at", "updated_at",
+            "id",
+            "user",
+            "status",
+            "status_display",
+            "total_price",
+            "customer_name",
+            "shipping_address",
+            "contact_phone",
+            "contact_email",
+            "comment",
+            "items",
+            "created_at",
+            "updated_at",
         )
         read_only_fields = fields
 
@@ -186,8 +206,15 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = (
-            "id", "customer_name", "shipping_address", "contact_phone",
-            "contact_email", "comment", "items", "total_price", "status",
+            "id",
+            "customer_name",
+            "shipping_address",
+            "contact_phone",
+            "contact_email",
+            "comment",
+            "items",
+            "total_price",
+            "status",
         )
         read_only_fields = ("id", "total_price", "status")
 
@@ -211,10 +238,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
         # Блокируем товары и проверяем остатки.
         product_ids = [it["product"].pk for it in items]
-        locked = {
-            p.pk: p
-            for p in Product.objects.select_for_update().filter(pk__in=product_ids)
-        }
+        locked = {p.pk: p for p in Product.objects.select_for_update().filter(pk__in=product_ids)}
         for it in items:
             product = locked.get(it["product"].pk)
             if product is None or not product.is_active:
@@ -223,8 +247,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 )
             if product.stock < it["quantity"]:
                 raise serializers.ValidationError(
-                    {"items": f"«{product.name}»: на складе {product.stock}, "
-                              f"запрошено {it['quantity']}."}
+                    {
+                        "items": f"«{product.name}»: на складе {product.stock}, "
+                        f"запрошено {it['quantity']}."
+                    }
                 )
 
         order = Order.objects.create(
@@ -241,8 +267,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             price = product.price
             order_items.append(
                 OrderItem(
-                    order=order, product=product,
-                    quantity=it["quantity"], price=price,
+                    order=order,
+                    product=product,
+                    quantity=it["quantity"],
+                    price=price,
                 )
             )
             total += price * it["quantity"]
@@ -250,9 +278,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
         # Списываем остатки атомарно
         for it in items:
-            Product.objects.filter(pk=it["product"].pk).update(
-                stock=F("stock") - it["quantity"]
-            )
+            Product.objects.filter(pk=it["product"].pk).update(stock=F("stock") - it["quantity"])
 
         order.total_price = total
         order.save(update_fields=("total_price",))

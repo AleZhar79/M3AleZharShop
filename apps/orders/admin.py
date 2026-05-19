@@ -1,4 +1,5 @@
 """Регистрация моделей orders в админке."""
+
 from django.contrib import admin, messages
 
 from apps.orders.models import Order, OrderItem, OrderStatus
@@ -54,8 +55,12 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ("status", "created_at")
     list_select_related = ("user",)
     search_fields = (
-        "id", "user__username", "user__email",
-        "contact_email", "contact_phone", "customer_name",
+        "id",
+        "user__username",
+        "user__email",
+        "contact_email",
+        "contact_phone",
+        "customer_name",
     )
     autocomplete_fields = ("user",)
     readonly_fields = ("created_at", "updated_at", "total_price")

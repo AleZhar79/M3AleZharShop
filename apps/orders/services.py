@@ -1,4 +1,5 @@
 """Бизнес-логика приложения orders."""
+
 from __future__ import annotations
 
 from decimal import Decimal
@@ -24,9 +25,7 @@ class OutOfStockError(Exception):
     """Запрошено больше, чем есть на складе."""
 
     def __init__(self, product: Product, requested: int, available: int) -> None:
-        super().__init__(
-            f"«{product.name}»: запрошено {requested}, доступно {available}."
-        )
+        super().__init__(f"«{product.name}»: запрошено {requested}, доступно {available}.")
         self.product = product
         self.requested = requested
         self.available = available
@@ -70,15 +69,17 @@ def place_order(*, user, cart: Cart, form_data: dict) -> Order:
         total_price=Decimal("0.00"),
     )
 
-    OrderItem.objects.bulk_create([
-        OrderItem(
-            order=order,
-            product=it["product"],
-            quantity=it["quantity"],
-            price=it["price"],
-        )
-        for it in items_snapshot
-    ])
+    OrderItem.objects.bulk_create(
+        [
+            OrderItem(
+                order=order,
+                product=it["product"],
+                quantity=it["quantity"],
+                price=it["price"],
+            )
+            for it in items_snapshot
+        ]
+    )
 
     # Списываем остатки одним UPDATE на каждый товар (атомарно через F).
     for it in items_snapshot:

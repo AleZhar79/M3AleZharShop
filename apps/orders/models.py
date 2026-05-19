@@ -1,4 +1,5 @@
 """Модели приложения orders: заказы и позиции заказа."""
+
 from __future__ import annotations
 
 from decimal import Decimal

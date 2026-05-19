@@ -1,4 +1,5 @@
 """Регистрация моделей products в админке."""
+
 from django.contrib import admin, messages
 
 from apps.products.models import Category, Product
