@@ -5,7 +5,11 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
 
+from apps.orders.admin_dashboard import dashboard as admin_dashboard
+
 urlpatterns = [
+    # Кастомный dashboard регистрируем ДО admin.site.urls.
+    path("admin/dashboard/", admin_dashboard, name="admin-dashboard"),
     path("admin/", admin.site.urls),
     # Каталог — основной namespace 'products' на '/products/'.
     path("products/", include("apps.products.urls")),
