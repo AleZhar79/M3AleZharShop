@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Корзина · M3AleZharShop{% endblock %}
+
+{% block content %}
+<h1>Корзина</h1>
+
+{% if cart.is_empty %}
+    <p>Корзина пуста. <a href="{% url 'products:product-list' %}">Перейти в каталог →</a></p>
+{% else %}
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart %}
+            <tr>
+                <td>
+                    <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                </td>
+                <td>{{ item.price }} ₽</td>
+                <td>
+                    <form action="{% url 'cart:update' item.product.id %}" method="post" class="cart-update-form">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99">
+                        <button type="submit" class="btn">Обновить</button>
+                    </form>
+                </td>
+                <td>{{ item.total_price }} ₽</td>
+                <td>
+                    <form action="{% url 'cart:remove' item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn--danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Итого</strong></td>
+                <td colspan="2"><strong>{{ cart.total_price }} ₽</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="cart-actions">
+        <form action="{% url 'cart:clear' %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--danger">Очистить корзину</button>
+        </form>
+        <a href="{% url 'products:product-list' %}" class="btn">Продолжить покупки</a>
+        <span class="muted">Оформление заказа появится на Шаге 5.</span>
+    </div>
+{% endif %}
+{% endblock %}

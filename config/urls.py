@@ -9,6 +9,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # Каталог — основной namespace 'products' на '/products/'.
     path("products/", include("apps.products.urls")),
+    # Корзина.
+    path("cart/", include("apps.cart.urls")),
+    # Отзывы.
+    path("reviews/", include("apps.reviews.urls")),
     # Главная страница '/' ведёт в каталог.
     path("", RedirectView.as_view(pattern_name="products:product-list", permanent=False)),
 ]

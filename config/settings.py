@@ -52,6 +52,7 @@ LOCAL_APPS = [
     "apps.products",
     "apps.orders",
     "apps.reviews",
+    "apps.cart",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -79,6 +80,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.cart.context_processors.cart",
             ],
         },
     },
@@ -127,6 +129,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Кастомная модель пользователя. Главное правило Django: задавать
 # AUTH_USER_MODEL ДО первой миграции и не менять позже.
 AUTH_USER_MODEL = "users.User"
+
+# Куда редиректит @login_required. Пока используем встроенную форму входа
+# админки — отдельную страницу логина сделаем на Шаге 5/6.
+LOGIN_URL = "admin:login"
 
 # Email — на этом шаге пишем письма в консоль
 EMAIL_BACKEND = os.getenv(
