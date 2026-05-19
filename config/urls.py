@@ -15,6 +15,8 @@ urlpatterns = [
     path("reviews/", include("apps.reviews.urls")),
     # Заказы.
     path("orders/", include("apps.orders.urls")),
+    # Личный кабинет.
+    path("account/", include("apps.account.urls")),
     # Главная страница '/' ведёт в каталог.
     path("", RedirectView.as_view(pattern_name="products:product-list", permanent=False)),
 ]

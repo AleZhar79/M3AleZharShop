@@ -53,6 +53,7 @@ LOCAL_APPS = [
     "apps.orders",
     "apps.reviews",
     "apps.cart",
+    "apps.account",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -132,7 +133,9 @@ AUTH_USER_MODEL = "users.User"
 
 # Куда редиректит @login_required. Пока используем встроенную форму входа
 # админки — отдельную страницу логина сделаем на Шаге 5/6.
-LOGIN_URL = "admin:login"
+LOGIN_URL = "account:login"
+LOGIN_REDIRECT_URL = "account:profile"
+LOGOUT_REDIRECT_URL = "products:product-list"
 
 # Email — на этом шаге пишем письма в консоль
 EMAIL_BACKEND = os.getenv(

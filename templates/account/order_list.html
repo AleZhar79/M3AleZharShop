@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}История заказов · M3AleZharShop{% endblock %}
+
+{% block content %}
+<h1>История заказов</h1>
+<p><a href="{% url 'account:profile' %}">← К профилю</a></p>
+
+{% if orders %}
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Дата</th>
+                <th>Статус</th>
+                <th>Позиций</th>
+                <th>Сумма</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>#{{ order.pk }}</td>
+                    <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                    <td>{{ order.items.count }}</td>
+                    <td>{{ order.total_price }} ₽</td>
+                    <td><a href="{% url 'account:order-detail' order.pk %}" class="btn">Открыть</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+        <nav class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn">← Назад</a>
+            {% endif %}
+            <span class="muted">Страница {{ page_obj.number }} из {{ paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn">Вперёд →</a>
+            {% endif %}
+        </nav>
+    {% endif %}
+{% else %}
+    <p class="muted">У вас пока нет заказов.</p>
+    <a href="{% url 'products:product-list' %}" class="btn">Перейти в каталог</a>
+{% endif %}
+{% endblock %}
