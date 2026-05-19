@@ -2,38 +2,92 @@
 {% block title %}{{ product.name }} · M3AleZharShop{% endblock %}
 
 {% block content %}
-{#
-   Заглушка детальной страницы товара.
-   Полная реализация (галерея, отзывы, кнопка «В корзину») — на Шаге 4.
-#}
 <p><a href="{% url 'products:product-list' %}">← Назад в каталог</a></p>
 
-<article style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px; background:#fff; padding:24px; border-radius:8px; border:1px solid #e5e7eb;">
-    <div class="product-card__image" style="aspect-ratio:1/1; border-radius:6px;
-        {% if product.image %}background-image:url('{{ product.image.url }}');{% endif %}">
+<article class="product-detail">
+    <div class="product-detail__image"
+        {% if product.image %}style="background-image:url('{{ product.image.url }}');"{% endif %}>
         {% if not product.image %}нет фото{% endif %}
     </div>
-    <div>
-        <h1 style="margin-top:0;">{{ product.name }}</h1>
-        <div style="color:#6b7280; margin-bottom:8px;">
+    <div class="product-detail__info">
+        <h1>{{ product.name }}</h1>
+        <div class="product-detail__category">
             Категория:
             <a href="{% url 'products:category-detail' product.category.slug %}">{{ product.category.name }}</a>
         </div>
-        <div style="font-size:24px; font-weight:600; margin:12px 0;">{{ product.price }} ₽</div>
-        {% if product.in_stock %}
-            <div class="product-card__stock product-card__stock--in" style="margin-bottom:12px;">
-                В наличии: {{ product.stock }}
+
+        {% if reviews_count %}
+            <div class="product-detail__rating">
+                Средний рейтинг:
+                <strong>{{ avg_rating|floatformat:1 }}</strong> / 5
+                <span class="muted">({{ reviews_count }} отзыв{{ reviews_count|pluralize:"а,ов" }})</span>
             </div>
         {% else %}
-            <div class="product-card__stock product-card__stock--out" style="margin-bottom:12px;">
-                Нет в наличии
-            </div>
+            <div class="product-detail__rating muted">Отзывов пока нет</div>
         {% endif %}
-        <p style="white-space:pre-line; color:#374151;">{{ product.description|default:"Описание появится позже." }}</p>
 
-        <div style="margin-top:16px; padding:12px; background:#fffbeb; border:1px dashed #fbbf24; border-radius:6px; color:#92400e; font-size:13px;">
-            Кнопка «Добавить в корзину» появится на Шаге 4.
-        </div>
+        <div class="product-detail__price">{{ product.price }} ₽</div>
+
+        {% if product.in_stock %}
+            <div class="product-card__stock product-card__stock--in">В наличии: {{ product.stock }}</div>
+
+            <form action="{% url 'cart:add' product.id %}" method="post" class="cart-add-form">
+                {% csrf_token %}
+                {{ cart_form.quantity.label_tag }}
+                {{ cart_form.quantity }}
+                {{ cart_form.override }}
+                <button type="submit" class="btn btn--primary">Добавить в корзину</button>
+            </form>
+        {% else %}
+            <div class="product-card__stock product-card__stock--out">Нет в наличии</div>
+        {% endif %}
+
+        <h2>Описание</h2>
+        <p class="product-detail__description">{{ product.description|default:"Описание появится позже." }}</p>
     </div>
 </article>
+
+<section class="reviews">
+    <h2>Отзывы</h2>
+
+    {% if user.is_authenticated %}
+        {% if user_already_reviewed %}
+            <p class="muted">Вы уже оставили отзыв на этот товар.</p>
+        {% else %}
+            <form action="{% url 'reviews:add' product.slug %}" method="post" class="review-form">
+                {% csrf_token %}
+                <div class="form-row">
+                    {{ review_form.rating.label_tag }}
+                    {{ review_form.rating }}
+                </div>
+                <div class="form-row">
+                    {{ review_form.comment.label_tag }}
+                    {{ review_form.comment }}
+                </div>
+                <button type="submit" class="btn btn--primary">Отправить отзыв</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p class="muted">
+            Чтобы оставить отзыв, <a href="{% url 'admin:login' %}?next={{ request.path }}">войдите</a>.
+        </p>
+    {% endif %}
+
+    {% if reviews %}
+        <ul class="reviews-list">
+            {% for review in reviews %}
+                <li class="review">
+                    <div class="review__head">
+                        <strong>{{ review.user.username }}</strong>
+                        <span class="review__rating">{{ review.rating }} / 5</span>
+                        <span class="muted">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    {% if review.comment %}
+                        <p class="review__comment">{{ review.comment }}</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
 {% endblock %}
